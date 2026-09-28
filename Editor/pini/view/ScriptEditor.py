@@ -241,6 +241,7 @@ class ScriptEditor(QPlainTextEdit):
 					os.rmdir(os.path.join(".",tempDir))
 
 	def showEvent(self,event):
+		self.compilingThread.toDestroy = False
 		self.compilingThread.start()
 
 	def hideEvent(self,event):

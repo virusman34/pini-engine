@@ -92,8 +92,6 @@ class CompilingThread(QThread):
 		self.toDestroy = True
 
 	def run(self):
-		self.toDestroy = False
-
 		while not self.toDestroy:
 			self.msleep(50)
 			try:

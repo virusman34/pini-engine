@@ -68,6 +68,5 @@ class SceneListController(QObject):
 	def New(self,path):
 		fp = QFile(path)
 		fp.open(QIODevice.WriteOnly)
-		fp.write("")
 		fp.close()
 

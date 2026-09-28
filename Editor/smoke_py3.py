@@ -1,6 +1,7 @@
 """Launch the migrated editor and open a disposable project offscreen."""
 
 import os
+import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -81,12 +82,35 @@ def check_save():
     assert scene.read_text(encoding="utf-8") == original + "\n", "Scene edit was not saved"
 
 
+def check_editor_features():
+    from controller.SceneListController import SceneListController
+    from view.AssetLibraryWindow import AssetLibraryWindow, AssetViewer
+
+    scene = PROJECT / "scene" / "새장면.lnx"
+    scenes = SceneListController.getInstance()
+    scenes.New(str(scene))
+    assert scene.is_file(), "New scene was not created"
+    scenes.Open(str(scene))
+    assert str(scene) in scenes.sceneList, "New scene did not open"
+
+    image = PROJECT / "image" / "mbill1.png"
+    imported = WORKSPACE / image.name
+    shutil.copyfile(image, imported)
+    library = AssetLibraryWindow()
+    assert library.explorer.moveFile(str(imported)) == "png", "Image import failed"
+    assert (PROJECT / "image" / "mbill1_1.png").is_file(), "Imported image was not copied"
+    viewer = AssetViewer(str(image))
+    assert viewer.AssetMode == 1, "Image preview did not open"
+    viewer.close()
+
+
 QTimer.singleShot(6000, check_preview)
 QTimer.singleShot(9000, check_save)
-QTimer.singleShot(12000, app.quit)
+QTimer.singleShot(10500, check_editor_features)
+QTimer.singleShot(15000, app.quit)
 app.exec()
 sys.excepthook = original_excepthook
 temporary_workspace.cleanup()
 if errors:
     raise errors[0]
-print("Editor launch, example copy, project open, scene edit, and save passed")
+print("Editor launch, example copy, scene edit, asset preview/import, and save passed")
