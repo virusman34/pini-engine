@@ -39,12 +39,14 @@ LNX의 형태는 아래와 같습니다.
 
 설치
 -------------
-실행 파일은 [여기](http://piniengine.com/)에서 다운 받으실 수 있습니다.
+PySide6 기반 Windows x64 미리보기 실행 파일은 [GitHub Releases](https://github.com/virusman34/pini-engine/releases)에서 `PiniEditor-windows-x64.zip`을 받으세요. 기존 원본 실행 파일은 [피니엔진 사이트](http://piniengine.com/)에 있습니다.
+
+ZIP 전체를 쓰기 가능한 폴더에 압축 해제하고 `PiniEditor.exe`를 실행합니다. `_internal` 폴더는 실행 파일과 같은 위치에 두세요. 실행 PC에는 Python이나 Visual Studio가 필요하지 않습니다. Windows 11 x64에서 예제 복사, 씬 생성·열기·편집·저장, 이미지 가져오기·미리보기, Lua 프리뷰 초기화를 확인했습니다. Windows·Android 게임 내보내기는 아직 검증되지 않았습니다.
 
 빌드 - 에디터 (Python 3 / PySide6, Windows)
 -------------
 
-현재 이식 중인 개발환경입니다. 프로젝트 선택, 예제 씬 열기·편집·저장, LNX 컴파일을 확인했습니다. 배포 빌드와 내보내기 기능은 아직 검증되지 않았습니다.
+소스에서 에디터를 실행하거나 Windows x64 배포 ZIP을 다시 만드는 개발환경입니다.
 
 1. Python 3.12 (64비트)와 Visual Studio C++ 빌드 도구를 설치합니다.
 2. 저장소 루트에서 다음 명령을 실행합니다.
@@ -57,6 +59,13 @@ py -3.12 -m venv .venv
 ```
 
 창을 띄우지 않는 검증은 `.\.venv\Scripts\python.exe Editor\smoke_py3.py`로 실행할 수 있습니다.
+
+배포 ZIP을 직접 빌드하려면 추가로 다음 명령을 실행합니다. Visual Studio C++ 빌드 도구가 필요하며, 빌드 결과는 `dist\PiniEditor-windows-x64.zip`입니다.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r Editor\requirements-build.txt
+.\Editor\build_portable.cmd
+```
 
 빌드 - 에디터 (기존 Python 2 환경)
 -------------

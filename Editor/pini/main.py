@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
-
 from config import *
 
-Error_Logger = open("ERROR_LOG.txt","w+")
 if config.__RELEASE__ == False : 
 	sys.path.append("../Noriter")
 else:
@@ -17,13 +15,19 @@ from Noriter.views.NoriterMainWindow import *
 from Noriter.utils.Settings import Settings
 
 import os
+from pathlib import Path
 import json
 import urllib.request, urllib.error, urllib.parse
+
+if getattr(sys, "frozen", False):
+	os.chdir(Path(sys._MEIPASS) / "Editor" / "pini")
+
+Error_Logger = open("ERROR_LOG.txt","w+")
 
 from view.LoaderView import LoaderWindow
 
 launcher = None
-if __name__ == "__main__":
+def run():
 	app = QtGui.QApplication(sys.argv)
 	app.setQuitOnLastWindowClosed(False)
 
@@ -39,4 +43,7 @@ if __name__ == "__main__":
 	Error_Logger.close()
 	##################
 	sys.exit(_exit_)
+
+if __name__ == "__main__":
+	run()
 

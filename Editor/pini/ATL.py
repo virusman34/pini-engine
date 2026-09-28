@@ -77,7 +77,8 @@ line_increment = [
 from ctypes import *
 from pathlib import Path
 
-atl = cdll.LoadLibrary(str(Path(__file__).resolve().parents[2] / ".venv" / "ATL.dll"))
+atl_path = Path(sys._MEIPASS) / "ATL.dll" if getattr(sys, "frozen", False) else Path(__file__).resolve().parents[2] / ".venv" / "ATL.dll"
+atl = cdll.LoadLibrary(str(atl_path))
 
 def _bytes(value):
 	return value.encode("utf-8") if isinstance(value, str) else value
