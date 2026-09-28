@@ -339,7 +339,7 @@ class TimelineKeyFrameArea(QWidget):
 							currentFrame = currentFrame + 1
 
 						if self.timeline._data[currentNode]["frames"][currentFrame][0] != f:
-							print "Invalid select keyframe information"
+							print("Invalid select keyframe information")
 							continue
 
 						self.timeline._data[currentNode]["frames"].pop(currentFrame)

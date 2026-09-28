@@ -4,7 +4,7 @@ from PySide.QtGui import *
 
 import shutil
 import os
-import Image
+from PIL import Image
 
 class FontManager(object) : 
 	_instance = None
@@ -39,7 +39,6 @@ class FontManager(object) :
 		_id = QFontDatabase.addApplicationFont(path)
 		family = QFontDatabase.applicationFontFamilies(_id)[0]
 
-		idx = idx.decode("utf-8")
 		self.fonts[idx] = family
 
 		return family
@@ -48,6 +47,6 @@ class FontManager(object) :
 		if idx in self.fonts : 
 			return self.fonts[idx]
 		else:
-			for k,v in self.fonts.iteritems():
+			for k,v in self.fonts.items():
 				return v
 			return ""

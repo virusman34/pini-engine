@@ -29,7 +29,7 @@ class TabWidget(QtGui.QTabWidget):
 		pass
 
 	def tab(self,title):
-		return TabWidget.__tab__(self,unicode(title))
+		return TabWidget.__tab__(self,str(title))
 
 	def focus(self,idx):
 		self.setCurrentIndex(idx)

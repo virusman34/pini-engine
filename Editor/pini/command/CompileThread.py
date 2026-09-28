@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 from PySide.QtGui import * 
 from PySide.QtCore import *
 
 import threading
-from Queue import Queue
+from queue import Queue
 
 import traceback
 import os
@@ -41,7 +39,7 @@ class ComplieThread(QThread):
 				curBlock = False
 				
 				if isdebug : 
-					print "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+					print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 
 				if curCmd["isInBlock"] :
 					curBlock = curCmd["blockIdx"]
@@ -68,12 +66,12 @@ class ComplieThread(QThread):
 
 						protocol.insert(compiled[0])
 						if isdebug : 
-							print ">", compiled[0]
+							print(">", compiled[0])
 
 				protocol.build(self.sceneCtrl)
-		except Exception, e:
+		except Exception as e:
 			traceback.print_exc(file=sys.stdout)
-			print ">>ComplieThread",e
+			print(">>ComplieThread",e)
 
 class CompilingThread(QThread):
 	# 프리뷰에 표기하기 위한 목적의 컴파일 스레드입니다.
@@ -101,7 +99,7 @@ class CompilingThread(QThread):
 			try:
 				try:
 					task = self.compileQueue.get(False)
-				except Exception, e:
+				except Exception as e:
 					if self.isBusy:
 						self.beginBusy.emit(False)
 					self.isBusy = False
@@ -132,10 +130,10 @@ class CompilingThread(QThread):
 
 				self.compileQueue.task_done()
 
-			except Exception, e:
-				print " >>CompilingThread",e
+			except Exception as e:
+				print(" >>CompilingThread",e)
 				traceback.print_exc(file=sys.stdout)
-				print " <<CompilingThread",e
+				print(" <<CompilingThread",e)
 
 class TempSaveThread(QThread):
 	# 임시저장을 위한 스레드입니다.

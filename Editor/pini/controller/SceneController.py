@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 import os
 import json
@@ -31,7 +29,7 @@ class SceneController(QObject):
 
 	def Save(self,plainText):
 		fp = QFile(self.path)
-		print ("Save..." + self.path)
+		print(("Save..." + self.path))
 		fp.open(QIODevice.WriteOnly | QIODevice.Text)
 		
 		out = QTextStream(fp)

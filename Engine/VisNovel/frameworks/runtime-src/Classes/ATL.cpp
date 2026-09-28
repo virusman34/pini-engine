@@ -582,10 +582,10 @@ extern "C"{
 	char* getStringVal(int idx,int key){
 		ATL_Frame* frame = ATL::getInstance()->getFrame(idx);
 		if(frame == nullptr){
-			return (char*)string("").c_str();
+			return (char*)"";
 		}
 		if(frame->properties.find(key) == frame->properties.end()){
-			return (char*)string("").c_str();
+			return (char*)"";
 		}
 		return (char*)frame->properties[key]._str.c_str();
 	}
@@ -602,7 +602,7 @@ extern "C"{
 			sprintf(a, "%d", c);
 			stm += a + string(",");
 		}
-		return (char*)stm.c_str();
+		static thread_local string result; result = stm; return (char*)result.c_str();
 	}
 
 	int numNode(char* id){

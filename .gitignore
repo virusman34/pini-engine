@@ -1,4 +1,5 @@
 *.pyc
+.venv/
 Editor/pini/errorout.txt
 Editor/pini/ERROR_LOG.txt
 Editor/pini/parser.out

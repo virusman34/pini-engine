@@ -41,7 +41,24 @@ LNX의 형태는 아래와 같습니다.
 -------------
 실행 파일은 [여기](http://piniengine.com/)에서 다운 받으실 수 있습니다.
 
-빌드 - 에디터
+빌드 - 에디터 (Python 3 / PySide6, Windows)
+-------------
+
+현재 이식 중인 개발환경입니다. 프로젝트 선택, 예제 씬 열기·편집·저장, LNX 컴파일을 확인했습니다. 배포 빌드와 내보내기 기능은 아직 검증되지 않았습니다.
+
+1. Python 3.12 (64비트)와 Visual Studio C++ 빌드 도구를 설치합니다.
+2. 저장소 루트에서 다음 명령을 실행합니다.
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r Editor\requirements-py3.txt
+.\Editor\build_atl.cmd
+.\Editor\pini\run.cmd
+```
+
+창을 띄우지 않는 검증은 `.\.venv\Scripts\python.exe Editor\smoke_py3.py`로 실행할 수 있습니다.
+
+빌드 - 에디터 (기존 Python 2 환경)
 -------------
 #### 필요 
 1. python 2.7 (32-bit)

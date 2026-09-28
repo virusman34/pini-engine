@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 import math
 
@@ -30,15 +28,15 @@ def EaseImmediately(time):
 #########################################
 ## types
 line_Interval = [
-	u"위치X",
-	u"위치Y",
-	u"크기X",
-	u"크기Y",
-	u"회전",
-	u"색상R",
-	u"색상G",
-	u"색상B",
-	u"색상A",
+	"위치X",
+	"위치Y",
+	"크기X",
+	"크기Y",
+	"회전",
+	"색상R",
+	"색상G",
+	"색상B",
+	"색상A",
 ]
 line_Interval_Default = [
 	0,
@@ -53,31 +51,36 @@ line_Interval_Default = [
 ]
 
 line_Instant = [
-	u"매크로",
-	u"루아",
-	u"이미지",
+	"매크로",
+	"루아",
+	"이미지",
 ]
 line_type = line_Interval + line_Instant
 
 ############################################
 #### ease type!
 line_ease = [
-	u"기본",
-	u"사인인",
-	u"사인아웃",
-	u"사인인아웃",
-	u"즉시",
+	"기본",
+	"사인인",
+	"사인아웃",
+	"사인인아웃",
+	"즉시",
 ]
 
 ##############################################
 #### set type
 line_increment = [
-	u"증가",
-	u"변경",
+	"증가",
+	"변경",
 ]
 
 from ctypes import *
-atl = cdll.LoadLibrary("ATL.so") 
+from pathlib import Path
+
+atl = cdll.LoadLibrary(str(Path(__file__).resolve().parents[2] / ".venv" / "ATL.dll"))
+
+def _bytes(value):
+	return value.encode("utf-8") if isinstance(value, str) else value
 
 atl.getNumberVal.restype = c_float
 atl.getNumberSetVal.restype = c_float
@@ -94,42 +97,43 @@ atl.getFrame.argtypes = [c_char_p,c_int,c_int,c_char_p,c_char_p]
 atl.getMaxFrame.argtypes = [c_char_p,c_int]
 atl.isExists.argtypes = [c_char_p]
 atl.numNode.argtypes = [c_char_p]
+atl.getStringVal.argtypes = [c_int,c_int]
 
 atl.registStringValue.argtypes = [c_char_p,c_char_p,c_char_p]
 atl.registNumberValue.argtypes = [c_char_p,c_char_p,c_float]
 atl.deleteNodeValue.argtypes = [c_char_p]
 
 def FAL_REGIST(json):
-	atl.registAnimation(json)
+	atl.registAnimation(_bytes(json))
 def FAL_GETFRAME(idx,node,frame,nodeName,_hash):
-	return atl.getFrame(idx,node,frame,nodeName,_hash)
+	return atl.getFrame(_bytes(idx),node,frame,_bytes(nodeName),_bytes(_hash))
 def FAL_GETVALUE(frame,key):
 	return atl.getNumberVal(frame,key), atl.getNumberSetVal(frame,key), atl.getNumberSet(frame, key)
 def FAL_GETSTRVALUE(frame,key):
-	return atl.getStringVal(frame,key).decode("mbcs")
+	return atl.getStringVal(frame,key).decode("utf-8", errors="replace")
 def FAL_ISVALUE(frame,key):
 	return atl.isValue(frame,key)
 def FAL_DELETEFRAME(frame):
 	atl.deleteFrame(frame)
 def FAL_MAXFRAME(idx,node):
-	return atl.getMaxFrame(idx,node)
+	return atl.getMaxFrame(_bytes(idx),node)
 def FAL_MARKEDFRAMES(idx,node):
-	frames = atl.getMarkedFrames(idx,node)
-	frames = frames.split(",")
+	frames = atl.getMarkedFrames(_bytes(idx),node)
+	frames = frames.split(b",")
 	if len(frames) > 0 :
 		frames = frames[0:-1]
 
 	frames = [int(v) for v in frames]
 	return frames
 def FAL_ISEXISTS(idx):
-	return atl.isExists(idx)
+	return atl.isExists(_bytes(idx))
 def FAL_NUMNODE(idx):
-	return atl.numNode(idx)
+	return atl.numNode(_bytes(idx))
 def FAL_REGISTSTRINGVALUE(node,idx,value):
-	atl.registStringValue(node,idx,value)
+	atl.registStringValue(_bytes(node),_bytes(idx),_bytes(value))
 def FAL_REGISTNUMBERVALUE(node,idx,value):
-	atl.registNumberValue(node,idx,value)
+	atl.registNumberValue(_bytes(node),_bytes(idx),value)
 def FAL_DELETENODEVALUE(node):
-	atl.deleteNodeValue(node)
+	atl.deleteNodeValue(_bytes(node))
 def FAL_CLEARFRAME(): 
 	atl.clearFrame()

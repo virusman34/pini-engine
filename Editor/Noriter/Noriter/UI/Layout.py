@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 from PySide import QtCore,QtGui
 from functools import wraps
@@ -31,7 +29,7 @@ class Layout(object):
 			self.Layout.End(self)
 
 		def Next(self):
-			print "HBox Next"
+			print("HBox Next")
 
 	class VBox(QtGui.QVBoxLayout):
 		def __init__(self,spacing=0):
@@ -48,7 +46,7 @@ class Layout(object):
 			self.Layout.End(self)
 
 		def Next(self):
-			print "HBox Next"
+			print("HBox Next")
 				
 	class GridBox(QtGui.QGridLayout):
 		def __init__(self,spacing=0):
@@ -182,7 +180,7 @@ class Layout(object):
 
 		btn = QtGui.QPushButton(self.widget)
 		btn.setMinimumSize(0,30)
-		btn.setText(unicode(text))
+		btn.setText(str(text))
 		if func is not None:
 			btn.clicked.connect(func)
 		self.addWidget(btn)
@@ -191,7 +189,7 @@ class Layout(object):
 	def label(self,text):
 		if self.widget is None: return
 		label = QtGui.QLabel(self.widget)
-		label.setText(unicode(text))
+		label.setText(str(text))
 		label.setStyleSheet("*{background-color:none;}")
 		self.addWidget(label)
 		return label
@@ -341,7 +339,7 @@ class Layout(object):
 		return True
 
 	def _clear(self,layout):
-		indexes = range(layout.count())
+		indexes = list(range(layout.count()))
 		indexes.sort(reverse=True)
 		for index in indexes:
 			item = layout.takeAt(index)
@@ -353,7 +351,7 @@ class Layout(object):
 	##################################
 	def addWidget(self, widget):
 		if len(self.layoutStack[-1]) <= 0:
-			print "addWidget failed!!!!!!"
+			print("addWidget failed!!!!!!")
 			return
 		last = self.layoutStack[-1][-1]
 		last.addWidget(widget)
@@ -368,7 +366,7 @@ class Layout(object):
 	###################################
 
 	def menu(self, text, keyseq, func):
-		arr = unicode(text).split("/")
+		arr = str(text).split("/")
 		current = self.menubars
 		for _str in arr:
 			if _str == "0" : 
@@ -395,7 +393,7 @@ class Layout(object):
 				self.mainWindow.setMenuBar(menubar)
 
 
-		for k, v in current.iteritems():
+		for k, v in current.items():
 			if isinstance(v, dict):
 				if '__menu__' not in current[k]:
 					if k.startswith("sep_"):

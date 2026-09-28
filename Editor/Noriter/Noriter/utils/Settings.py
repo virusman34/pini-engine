@@ -1,3 +1,4 @@
+import os
 from PySide import QtCore
 
 class Settings(object):
@@ -22,6 +23,8 @@ class Settings(object):
 			self.db.setValue(key,value)
 			
 	def __getitem__(self,key):
+		if key == "workspace" and os.environ.get("PINI_WORKSPACE"):
+			return os.environ["PINI_WORKSPACE"]
 		return self.db.value(key)
 
 	def __delitem__(self,key):

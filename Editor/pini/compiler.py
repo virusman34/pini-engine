@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 import copy
 from slpp import slpp
@@ -199,11 +197,11 @@ def t_SEMI_LLPAREN(t):
 
 def t_SEMI_ALL(t):
 	r'.'
-	if t.value == u"[" : 
+	if t.value == "[" :
 		t.lexer.mparen_count += 1
 		t.lexer.push_state("INITIAL")
 		t.type = "LPARENINSEMI"
-	elif t.value == u"<" : 
+	elif t.value == "<" :
 		t.lexer.push_state("INITIAL")
 		t.type = "LT"
 	return t;
@@ -240,16 +238,16 @@ def t_GT(t):
 def t_NAME(t):
 	r'[a-zA-Z_가-힣ㄱ-ㅎㅏ-ㅣ][a-zA-Z_0-9가-힣ㄱ-ㅎㅏ-ㅣ.]*'
 	t.type = RESERVED.get(t.value, "NAME")
-	if t.value == u"참" : 
+	if t.value == "참" :
 		t.type = "NUMBER"
 		t.value = 1
-	elif t.value == u"거짓" :  
+	elif t.value == "거짓" :
 		t.type = "NUMBER"
 		t.value = 0
-	elif t.value == u"또는" :
+	elif t.value == "또는" :
 		t.type = "PLUS"
 		t.value = '+'
-	elif t.value == u"그리고" :  
+	elif t.value == "그리고" :
 		t.type = "MULT"
 		t.value = '*'
 	return t
@@ -333,12 +331,12 @@ def t_BRPAREN(t):
 
 def t_error(t):
 	raise PiniSyntaxError(t,"Unknown symbol %r" % (t.value[0],))
-	print "Skipping", repr(t.value[0])
+	print("Skipping", repr(t.value[0]))
 	t.lexer.skip(1)
 
 def t_SEMI_error(t):
 	raise PiniSyntaxError(t,"SEMI STATE >>> Unknown symbol %r" % (t.value[0],))
-	print "SEMI STATE >>> Skipping", repr(t.value[0])
+	print("SEMI STATE >>> Skipping", repr(t.value[0]))
 	t.lexer.skip(1)
 
 ## I implemented INDENT / DEDENT generation as a post-processing filter
@@ -492,7 +490,7 @@ def filter(lexer, add_endmarker = True):
 
 class IndentLexer(object):
 	def __init__(self, debug=0, optimize=0, lextab='lextab', reflags=0):
-		print debug, optimize, lextab,reflags
+		print(debug, optimize, lextab,reflags)
 		self.lexer = lex.lex(debug=debug, optimize=optimize, lextab=lextab, reflags=reflags)
 		self.token_stream = None
 	def input(self, s, add_endmarker=True):
@@ -503,7 +501,7 @@ class IndentLexer(object):
 		self.token_stream = filter(self.lexer, add_endmarker)
 	def token(self):
 		try:
-			return self.token_stream.next()
+			return next(self.token_stream)
 		except StopIteration:
 			return None
 
@@ -520,7 +518,7 @@ def p_file_input(p):
 				  | file_input stmt
 				  | NEWLINE
 				  | stmt"""
-	if isinstance(p[len(p)-1], basestring):
+	if isinstance(p[len(p)-1], str):
 		if len(p) == 3:
 			p[0] = p[1]
 		else:
@@ -730,7 +728,7 @@ def p_else_stmt(p):
 	else_stmt : else_stmt suite
 			  | ELSE COLON 
 	'''
-	if isinstance(p[1],unicode) : 
+	if isinstance(p[1],str) :
 		p[0] = {"type":"else", "stmts":[] ,"ln":p.lineno(1)}
 	else:
 		p[1]["stmts"] = p[2]
@@ -935,12 +933,12 @@ def p_markup(p):
 		   | LT DIV NAME
 	"""
 	if len(p) == 4 :
-		if p[2] == u"=" :  
+		if p[2] == "=" :
 			p[0] = {"type":"markup","class":p[2],"args":[{"v":p[3]}],"ln":p.lineno(1)}
 		else : 
 			p[0] = {"type":"markup","class":p[2],"args":[{"v":p[3]}],"ln":p.lineno(1)}
 	else:
-		if p[1] == u"<" : 
+		if p[1] == "<" :
 			p[0] = {"type":"markup","class":p[2],"args":[],"ln":p.lineno(1)}
 		else:
 			p[1]["args"] += [p[2]]
@@ -1070,7 +1068,7 @@ def p_def_autocomplete(p):
 		p[0] = {"type":"autocomplete","name":p[2],"list":p[3]}
 
 def p_error(p):
-	print "Error!", repr(p)
+	print("Error!", repr(p))
 	raise PiniSyntaxError(p,repr(p))
 
 class GardenSnakeParser(object):
@@ -1091,14 +1089,7 @@ class GardenSnakeParser(object):
 		return result
 
 def getV(v):
-	ret = unicode( "", "utf-8")	
-	if v != None:
-		if isinstance(v, unicode)==False:
-			ret = str(v)
-			ret = unicode(ret, "utf-8")
-		else:
-			ret = v
-	return  ret
+	return v.decode("utf-8") if isinstance(v, bytes) else "" if v is None else str(v)
 
 ###### Code generation ######
 class LNXCompiler(object):
@@ -1111,23 +1102,13 @@ class LNXCompiler(object):
 				from controller.ProjectController import ProjectController
 				for define in ProjectController().defines:
 					code = code.replace(define[0],define[1])
-			except Exception, e:
+			except Exception as e:
 				pass
 
 		code = code.replace("]<","] <")
 		# compile
 		tree = self.parser.parse(code)
 		return tree
-
-####### Support UTF-8 ############
-for k in locals().keys() :
-	if k.startswith("t_"):
-		v = locals()[k]
-		if type(v) == FunctionType : 
-			if v.__doc__ :
-				locals()[k].__doc__ = unicode(locals()[k].__doc__,"utf-8")
-		elif type(v) == StringType:
-			locals()[k] = unicode(locals()[k],"utf-8")
 
 ####### Optimizer #########
 class LNXOptimizer(object) : 
@@ -1167,9 +1148,9 @@ class LNXOptimizer(object) :
 
 	def new_value(self,value,isOptimize=True):
 		typeof = "number"
-		if type(value) == StringType : 
+		if isinstance(value, str) :
 			typeof = "string"
-		elif type(value) == ListType : 
+		elif isinstance(value, list) :
 			typeof = "list"
 		ret = {
 			"type":"atom",
@@ -1201,7 +1182,7 @@ class LNXOptimizer(object) :
 	# 0 : var # 1 : number # 2 : string
 	def optimize_atom(self,o):
 		if isinstance(o,dict):
-			for k in o.keys():
+			for k in list(o.keys()):
 				self.optimize_atom(o[k])
 		elif isinstance(o,tuple) or \
 			 isinstance(o,list):
@@ -1272,14 +1253,14 @@ class LNXOptimizer(object) :
 						if line["e"] == None:
 							del line["e"]
 						fList.append(line)
-					if type(line["v"]) == TupleType:
+					if isinstance(line["v"], tuple):
 						raise PiniCannotFormulaOnAnimationError(frame["ln"],"Animation target cannot be formula")
 				frame["stmts"] = fList
 				del frame["type"]
 		del v["type"]
 		return {
 			"t" : LNXOptimizer.cmd("animation"),
-			"json" : json.dumps(v,ensure_ascii=False,encoding="utf-8"),
+			"json" : json.dumps(v,ensure_ascii=False),
 			"ln" : ln
 		}
 
@@ -1371,8 +1352,8 @@ class LNXOptimizer(object) :
 			else:
 				try:
 					a += v
-				except Exception, e:
-					print v
+				except Exception as e:
+					print(v)
 					raise e
 
 		for v in tree :
@@ -1380,9 +1361,9 @@ class LNXOptimizer(object) :
 				if v["type"] != "word" and v["type"] != "markup" :
 					if not "insemi" in v :
 						ln = v["ln"]
-						q(o,self.operate_markup(u"클릭",[],ln))
+						q(o,self.operate_markup("클릭",[],ln))
 						#q(o,self.operate_markup(u"클린",[],ln))
-						q(o,self.operate_markup(u"대사창사라짐",[],v["ln"]))
+						q(o,self.operate_markup("대사창사라짐",[],v["ln"]))
 						isWordMode = False
 
 			if v["type"] == "atom" or \
@@ -1481,7 +1462,7 @@ class LNXOptimizer(object) :
 
 			elif v["type"] == "word" : 
 				if not isWordMode :
-					q(o,self.operate_markup(u"대사창나타남",[],v["ln"]))
+					q(o,self.operate_markup("대사창나타남",[],v["ln"]))
 				q(o,self.operate_word(v["list"],v["ln"]))
 				isWordMode = True
 
@@ -1490,12 +1471,12 @@ class LNXOptimizer(object) :
 				q(o,self.operate_markup(v["class"],v["args"],v["ln"]))
 
 			else:
-				print ">>>>",v["type"]
+				print(">>>>",v["type"])
 
 		if (not isInline) and isWordMode : 
-			q(o,self.operate_markup(u"클릭",[],v["ln"]))
+			q(o,self.operate_markup("클릭",[],v["ln"]))
 			#q(o,self.operate_markup(u"클린",[],v["ln"]))
-			q(o,self.operate_markup(u"대사창사라짐",[],v["ln"]))
+			q(o,self.operate_markup("대사창사라짐",[],v["ln"]))
 
 		return o
 
@@ -1564,7 +1545,7 @@ class LNXLuaLinker(object) :
 		l = self.CALCULATE_PART(L,rets)
 		r = self.CALCULATE_PART(R,rets)
 
-		if OP in self.opTable.keys():
+		if OP in list(self.opTable.keys()):
 			if OP == "!":
 				return "(" + r + " ~= 0 and 0 or 1)"
 			else:
@@ -1724,7 +1705,7 @@ class LNXLuaLinker(object) :
 				funcInfo += '_LNXFucInfo["'+fname+'"]["default"] = "'+explain["v"]+'"\n'
 				funcInfo += '_LNXFucInfo["'+fname+'"]["extens"]  = __def\n'
 				funcInfo += '_LNXFucInfo["'+fname+'"]["explain"] = __exd\n'
-				funcInfo += '_LNXFucInfo["'+fname+'"]["idx"]     = '+unicode(funcInfoCounter)+'\n'
+				funcInfo += '_LNXFucInfo["'+fname+'"]["idx"]     = '+str(funcInfoCounter)+'\n'
 				funcInfoCounter = funcInfoCounter + 1
 
 			elif v["t"] == 10 : #animation def
@@ -1741,7 +1722,7 @@ class LNXLuaLinker(object) :
 
 		code = lnc[0]+"} end\n\n"
 		_bmks = "_LNXB['"+stck+"']=" if stck else "_LNXB[fname]=" 
-		if len(BMKS.keys()) > 0 : 
+		if len(list(BMKS.keys())) > 0 :
 			_bmks += slpp.encode(BMKS)+"\n"
 		else:
 			_bmks += "{}\n"
@@ -1778,8 +1759,8 @@ class LNXToolChain(object) :
 		try:
 			s,o = self.gen_obj(text)
 			return self.gen_lua(o)
-		except Exception, e:
-			print "LNXToolChain BUILD > ",e
+		except Exception as e:
+			print("LNXToolChain BUILD > ",e)
 			traceback.print_exc(file=sys.stdout)
 			return False
 
@@ -1790,10 +1771,10 @@ class LNXToolChain(object) :
 			text = text.replace("\\","\\\\")
 			tree = self.compile(text,None,isActivePreProcess)
 			obj  = self.optimize(tree,isInline)
-		except Exception, e:
-			print "LNXToolChain GEN_OBJECT > ",e
+		except Exception as e:
+			print("LNXToolChain GEN_OBJECT > ",e)
 			traceback.print_exc(file=sys.stdout)
-			return False,e.lineno
+			return False,getattr(e, "lineno", 0)
 		return True,obj
 
 	def gen_lua(self,obj) :
@@ -1839,12 +1820,12 @@ class LNXToolChain(object) :
 if __name__ == "__main__":
 	build = LNXToolChain().build
 	####### Test code #######
-	code = u"""
+	code = """
 c = 30*w+[w]+[w]+[w]+20+b
 c = 30*w+20+b
 c = 30*w+20+b
 c = 30*w+20+b
 """
 
-	print build(code)
-	print "--==> Done"
+	print(build(code))
+	print("--==> Done")

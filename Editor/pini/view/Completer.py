@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 from PySide.QtGui import * 
 from PySide.QtCore import *
@@ -95,7 +93,7 @@ class Completer(QCompleter) :
 							self.explain_img.resize(0,0)
 							self.explain_img.setPixmap(QPixmap())
 					else:
-						self.explain_text.setHtml(u"설명이 없습니다.")
+						self.explain_text.setHtml("설명이 없습니다.")
 				self.previousRow = currentRow
 			elif self.explain.isVisible() and self.prepare == False : 
 				pass

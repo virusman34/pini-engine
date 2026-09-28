@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 import os
 import json
@@ -12,7 +10,7 @@ import shutil
 import compiler
 from slpp import slpp
 import json
-from Queue import Queue
+from queue import Queue
 
 import os_encoding
 import traceback
@@ -27,7 +25,7 @@ import codecs
 class ProjectController(QObject):
 	class ProjectModel(QObject):pass
 	#signal
-	changed = Signal(unicode)
+	changed = Signal(str)
 
 	_instance = None
 	_isInit   = False
@@ -77,19 +75,19 @@ class ProjectController(QObject):
 		
 		try:
 			self._screenWidth = _d["width"]
-		except Exception, e:
+		except Exception as e:
 			pass
 		try:
 			self._screenHeight = _d["height"]
-		except Exception, e:
+		except Exception as e:
 			pass
 		try:
 			self._fullscreen = _d["fullscreen"]
-		except Exception, e:
+		except Exception as e:
 			pass
 		try:
 			self._orientation = _d["orientation"]
-		except Exception, e:
+		except Exception as e:
 			pass
 
 		self._defines = []
@@ -98,7 +96,7 @@ class ProjectController(QObject):
 			_d = json.loads(fileOpen(DEFFILE))
 
 			self._defines = _d["defines"]
-		except Exception, e:
+		except Exception as e:
 			pass
 
 	def projectInfoSave(self):
@@ -205,21 +203,14 @@ class ProjectController(QObject):
 			return json.loads(text)
 
 		def checksum(fpath):
-			return base64.b64encode(hashlib.md5(open(fpath, 'rb').read()).digest())
+			return base64.b64encode(hashlib.md5(open(fpath, 'rb').read()).digest()).decode("ascii")
 
 		def fileNameMD(fname):
 			fname.encode(os_encoding.cp())
-			return base64.encodestring(fname.encode(os_encoding.cp())).replace("\n","").replace("=","_").replace("+","_0_").replace("/","__0")
+			return base64.b64encode(fname.encode(os_encoding.cp())).decode("ascii").replace("=","_").replace("+","_0_").replace("/","__0")
 	
 		def getV(v):
-			ret = unicode( "", "utf-8")	
-			if v != None:
-				if isinstance(v, unicode)==False:
-					ret = str(v)
-					ret = unicode(ret, "utf-8")
-				else:
-					ret = v
-			return  ret
+			return v.decode("utf-8") if isinstance(v, bytes) else "" if v is None else str(v)
 
 		def findWordInCompiledObject(o,marge):
 			for v in o : 
@@ -227,18 +218,18 @@ class ProjectController(QObject):
 			 		for w in v["strs"] : 
 			 			marge[w] = marge.get(w, 0) + 1
 
-		DEFAULT_PROJ_RES = u"resource/proj_default"
+		DEFAULT_PROJ_RES = "resource/proj_default"
 		for root, dirs, files in os.walk(DEFAULT_PROJ_RES, topdown=False):
 			for name in files:
 				fullpath = os.path.join(root, name)
 				dstDir = PROJPATH + root.replace(DEFAULT_PROJ_RES,"") + "\\"
 				dst = dstDir + name
 
-				if name == u"libdef.lnx" : 
+				if name == "libdef.lnx" :
 					if checksum(fullpath) != checksum(dst) : 
 						try:
 							os.remove(dst)
-						except Exception, e:
+						except Exception as e:
 							pass
 						shutil.copyfile(fullpath,dst)
 				elif name == "TMP" : 
@@ -248,7 +239,7 @@ class ProjectController(QObject):
 						try:
 							if not os.path.exists(dstDir):
 								os.makedirs(dstDir)
-						except Exception, e:
+						except Exception as e:
 							pass
 						shutil.copyfile(fullpath,dst)
 						
@@ -256,7 +247,7 @@ class ProjectController(QObject):
 		try:
 			versionDir = os.path.join("..","pini_ver.inf")
 			compilerVersion = readAll(versionDir)
-		except Exception, e:
+		except Exception as e:
 			pass
 
 		checks = {}
@@ -270,7 +261,7 @@ class ProjectController(QObject):
 				checks = {}
 			elif checks["compilerVersion"] != compilerVersion:
 				checks = {}
-		except Exception, e:
+		except Exception as e:
 			pass
 
 		checks["compilerVersion"] = compilerVersion
@@ -335,7 +326,7 @@ class ProjectController(QObject):
 					try:
 						if checks[ID] == checksum(fullpath) : 
 							continue
-					except Exception, e:
+					except Exception as e:
 						continue
 					
 				######### file compile! #########
@@ -345,7 +336,7 @@ class ProjectController(QObject):
 						luaToolChain = compiler.LNXToolChain()
 					if name == "libdef.lnx" or (not isPrecompile):
 						# print "compile!" , fullpath
-						CompileProgressWindow(None).setText(u"컴파일 중 - " + name)
+						CompileProgressWindow(None).setText("컴파일 중 - " + name)
 						l,o,errLine = luaToolChain.compileFile(fullpath,dist,name != "libdef.lnx")
 					else:
 						o = "[]"
@@ -396,14 +387,14 @@ class ProjectController(QObject):
 											col_count = 0
 											for cell in row:
 												if cell.value != None : 
-													row_table[unicode(col_count)] = getV(cell.value)
+													row_table[str(col_count)] = getV(cell.value)
 												col_count = col_count+1
 											if len(row_table) > 0 : 
-												table[sheet.title][unicode(row_count)] = row_table
+												table[sheet.title][str(row_count)] = row_table
 											row_count = row_count+1
 
 								with codecs.open(dist, "w", "utf-8") as fp : 
-									fp.write(json.dumps(table, ensure_ascii=False,encoding="utf-8"))
+									fp.write(json.dumps(table, ensure_ascii=False))
 
 								# fp = QFile(dist)
 								# fp.open(QIODevice.WriteOnly | QIODevice.Text)
@@ -417,16 +408,16 @@ class ProjectController(QObject):
 								# wb = None
 
 							#shutil.copyfile(fullpath,dist)
-						except Exception, e:
+						except Exception as e:
 							traceback.print_exc(file=sys.stdout)
 				else:
 					try:
 						shutil.copyfile(fullpath,dist)
-					except Exception, e:
-						print e
+					except Exception as e:
+						print(e)
 				try:
 					checks[ID] = checksum(fullpath)
-				except Exception, e:
+				except Exception as e:
 					pass
 
 		if not isPrecompile:
@@ -451,7 +442,7 @@ class ProjectController(QObject):
 		#FILEMANGER
 		with codecs.open(BUILDPATH+"FILEMANS.lua", "w", "utf-8") as fp : 
 			fp.write("FILES = {}\n")
-			for k,v in fileMans.iteritems() :
+			for k,v in fileMans.items() :
 				fp.write("FILES[\""+k+"\"]=\""+v+"\"\n")
 
 		# fp = QFile(BUILDPATH+"FILEMANS.lua")
@@ -470,7 +461,7 @@ class ProjectController(QObject):
 		#IMAGEMANAGER
 		with codecs.open(BUILDPATH+"IMGMANS.lua", "w", "utf-8") as fp : 
 			fp.write("IMAGES = {}\n")
-			for k,v in imgMans.iteritems() :
+			for k,v in imgMans.items() :
 				fp.write("IMAGES[\""+k+"\"]="+slpp.encode(v)+"\n")
 
 		# fp = QFile(BUILDPATH+"IMGMANS.lua")
@@ -578,7 +569,7 @@ class WorkerController(QObject):
 	def doWork(self):
 		try:
 			task = self.workQueue.get(False)
-		except Exception, e:
+		except Exception as e:
 			self.isWorking = False
 			return
 
@@ -614,11 +605,11 @@ class WorkerThread(QThread):
 			result = self.work()
 			# print "__END WORK"
 
-		except Exception, e:
-			print " >>WorkerThread",e
+		except Exception as e:
+			print(" >>WorkerThread",e)
 			traceback.print_exc(file=sys.stdout)
 			result = str(e) + "\n" + traceback.format_exc()
-			print " <<WorkerThread",e
+			print(" <<WorkerThread",e)
 
 		finally:
 			self.workFinished.emit([self.callback,result,self.callbackInst])

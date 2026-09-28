@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 from config import *
 
@@ -20,16 +18,23 @@ from Noriter.utils.Settings import Settings
 
 import os
 import json
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from view.LoaderView import LoaderWindow
 
 launcher = None
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
+	app.setQuitOnLastWindowClosed(False)
+
+	def quit_when_no_windows():
+		if not any(window.isVisible() for window in app.topLevelWidgets()):
+			app.quit()
+
+	app.lastWindowClosed.connect(lambda: QTimer.singleShot(0, quit_when_no_windows))
 
 	v = LoaderWindow()
-	_exit_ = app.exec_()
+	_exit_ = app.exec()
 	##################
 	Error_Logger.close()
 	##################

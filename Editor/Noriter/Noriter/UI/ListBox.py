@@ -153,7 +153,7 @@ class ListBox(QtGui.QWidget) :
 			widget.pal = widget.palette();
 
 		Pal = QtGui.QPalette()
-		Pal.setColor(QtGui.QPalette.Background, QtGui.QColor(100,100,100,125))
+		Pal.setColor(QtGui.QPalette.Window, QtGui.QColor(100,100,100,125))
 		widget.setAutoFillBackground(True)
 		widget.setPalette(Pal)
 
@@ -166,7 +166,7 @@ class ListBox(QtGui.QWidget) :
 	def removeAllWidget(self):
 		self.widgets = []
 
-		indexes = range(self._layout.count())
+		indexes = list(range(self._layout.count()))
 		indexes.sort(reverse=True)
 		for index in indexes:
 			item = self._layout.takeAt(index)

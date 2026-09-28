@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 import math, random
 
 from PySide.QtCore import *
 from PySide.QtGui import * 
-from PySide.QtWebKit import *
 
 from controller.ProjectController import *
 from Noriter.views.NoriterMainWindow import *
@@ -128,7 +125,7 @@ class DesignerScene(QGraphicsScene):
 				o.setSelected(False)
 
 	def updatePosItems(self):
-		for o in self.items():
+		for o in list(self.items()):
 			if o.__class__ == UIObject :
 				o.updatePosItem()
 
@@ -176,35 +173,13 @@ class DesignerView(QGraphicsView):
 			widget.setStyleSheet("*{background-color:rgba(0,0,0,0);}")
 			return proxy
 
-		s = widgetProxy(QtGui.QCheckBox(unicode("화면맞춤","utf-8")),10,10)
+		s = widgetProxy(QtGui.QCheckBox("화면맞춤"),10,10)
 		self.FIVCheck = s.widget()
 		self.FIVCheck.toggled.connect(self.FIVtoggled)
 		self.FIVCheck.setChecked(True)
 
-		s = widgetProxy(QtGui.QPushButton(unicode("중앙","utf-8")),85,6)
+		s = widgetProxy(QtGui.QPushButton("중앙"),85,6)
 		s.widget().clicked.connect(self.screenMoveCenter)
-
-		self.web = QGraphicsWebView(self.screenInfo)
-		self.web.setHtml("""
-		<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-			ga('create', 'UA-59101417-4', 'auto');
-			ga('send', 'pageview');
-		</script>
-		""")
-		self.web.setContentsMargins(0,0,0,0)
-
-		def loadFinished(ok):
-			self.web.page().setLinkDelegationPolicy(QWebPage.DelegateAllLinks)
-		self.web.loadFinished.connect(loadFinished)
-
-		def linkClicked(url):
-			QDesktopServices.openUrl(url);
-		self.web.linkClicked.connect(linkClicked)
 
 		#########################################
 		self.screenMoveCenter()
@@ -292,17 +267,15 @@ class DesignerView(QGraphicsView):
 			self.scene.fitInView(not self.FIVCheck.isChecked())
 
 			mat = self.matrix()
-			self.topLayer.scale(1 / mat.m11(), 1/ mat.m22())
+			self.topLayer.setTransform(QTransform.fromScale(1 / mat.m11(), 1 / mat.m22()))
 
 			p = self.mapToScene(QPoint(0,0))
 			self.topLayer.setPos(p.x(),p.y())
 
 			self.logWindow.setPos(0,self.height())
-			self.web.setPreferredSize(400,400)
-			self.web.setPos(self.width()-420,self.height()-420)
 
-		except Exception, e:
-			print "throw ininin",e
+		except Exception as e:
+			print("throw ininin",e)
 		
 	def FIVtoggled(self,p):
 		if self.FIVCheck.isChecked() == False :

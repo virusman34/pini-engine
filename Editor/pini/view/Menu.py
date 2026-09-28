@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 from Noriter.UI.Layout import *
 from Noriter.views.NoriterMainWindow import *
@@ -46,7 +44,7 @@ from appdirs import *
 from view.OutputWindow import OutputWindow 
 
 import socket
-import thread, time
+import _thread as thread, time
 
 from command.RemoteClient import RemoteClient
 
@@ -78,9 +76,9 @@ def OpenScene():
 		if fi.suffix() == "lnx" :
 			SceneListController.getInstance().Open(path)
 		else:
-			print "can not open scene"
+			print("can not open scene")
 	else:
-		print "can not open scene"
+		print("can not open scene")
 
 @MenuBar("파일(&F)/스크립트 저장(&S)",QKeySequence.Save)
 def Save(showAleart=False,discard=None):
@@ -101,8 +99,8 @@ def Save(showAleart=False,discard=None):
 			return -1
 
 		msgBox = QMessageBox()
-		msgBox.setText(u"저장")
-		msgBox.setInformativeText(currentFileName + u"을(를) 저장하시겠습니까?")
+		msgBox.setText("저장")
+		msgBox.setInformativeText(currentFileName + "을(를) 저장하시겠습니까?")
 		msgBox.setStandardButtons(flag)
 		msgBox.setDefaultButton(QMessageBox.Cancel)
 		msgBox.setIcon(QMessageBox.Warning)
@@ -118,7 +116,7 @@ def Save(showAleart=False,discard=None):
 		sceneScriptWindowManager = SceneScriptWindowManager.getInstance()
 		sceneScriptWindowManager.saveActiveScene()
 
-	OutputWindow().notice(u"파일이 저장되었습니다.")
+	OutputWindow().notice("파일이 저장되었습니다.")
 	return 1
 
 @MenuBar("파일(&F)/스크립트 모두 저장(&A)",[QKeySequence(Qt.CTRL+Qt.SHIFT+Qt.Key_S)])
@@ -279,11 +277,11 @@ def OpenExportAndroid(showAleart=False,discard=None):
 		return
 
 	m = NoriterMain()
-	text,ok = QInputDialog.getText(m, u"새로운 루아 모듈",u"모듈이름을 적어주세요.")
+	text,ok = QInputDialog.getText(m, "새로운 루아 모듈","모듈이름을 적어주세요.")
 	if ok and text:
-		fullpath = os.path.join(inst.path,"module",text+u".lua")
+		fullpath = os.path.join(inst.path,"module",text+".lua")
 		if os.path.exists(fullpath) :
-			QMessageBox.warning(m,u"피니엔진",u"모듈명이 중복되었습니다. 다른 이름으로 해주세요.")
+			QMessageBox.warning(m,"피니엔진","모듈명이 중복되었습니다. 다른 이름으로 해주세요.")
 			return
 
 		fp = QFile(fullpath)
@@ -292,17 +290,17 @@ def OpenExportAndroid(showAleart=False,discard=None):
 		out = QTextStream(fp)
 		out.setCodec("UTF-8")
 		out.setGenerateByteOrderMark(False)
-		out <<u"--함수 정의 코드는 여기에 적어주세요.\n\n"
-		out <<u"local function m(fileName)\n"
-		out <<u"	--[스크립트] 매크로가 불리는 시점에 실행 될 루아 코드를 적어주세요.\n\n\n"
-		out <<u"end\n"
+		out <<"--함수 정의 코드는 여기에 적어주세요.\n\n"
+		out <<"local function m(fileName)\n"
+		out <<"	--[스크립트] 매크로가 불리는 시점에 실행 될 루아 코드를 적어주세요.\n\n\n"
+		out <<"end\n"
 	
 
-		out <<u"return m\n"
+		out <<"return m\n"
 		out = None
 		fp.close()
 
-		QMessageBox.information(m,u"피니엔진",u"성공적으로 생성하였습니다.")
+		QMessageBox.information(m,"피니엔진","성공적으로 생성하였습니다.")
 		filePath = fullpath.encode(locale.getpreferredencoding())
 		os.system('start "" "'+filePath+'"')
 
@@ -322,7 +320,7 @@ def PreMainScript():
 	if len(inst.path) == 0 : 
 		return
 	
-	targetPath = inst.path + u"/scene/프리메인.lnx"
+	targetPath = inst.path + "/scene/프리메인.lnx"
 
 	if not os.path.isfile(targetPath) :
 		SceneListController.getInstance().New(targetPath)
@@ -438,49 +436,49 @@ def __run__(clean,isCurrentScene,startLine=None):
 			APPPATH = "../../Engine/window64"
 			try:
 				shutil.rmtree(APPPATH + "/src")
-			except Exception, e:
+			except Exception as e:
 				pass
 			try:
 				shutil.rmtree(APPPATH + "/res")
-			except Exception, e:
+			except Exception as e:
 				pass
 			try:
 				shutil.copytree(APPPATH + "/../VisNovel/src",APPPATH + "/src")
-			except Exception, e:
+			except Exception as e:
 				pass
 			try:
 				shutil.copytree(APPPATH + "/../VisNovel/res",APPPATH + "/res")
-			except Exception, e:
+			except Exception as e:
 				pass
 
 		else : 
 			APPPATH = "window"
 
-	print APPPATH
+	print(APPPATH)
 	####### run !!!!!
 	OutputWindow().notice("RUN : "+APPPATH)
-	OutputWindow().notice(u"테스트 플레이를 위한 컴파일 시작")
+	OutputWindow().notice("테스트 플레이를 위한 컴파일 시작")
 
 	msgBox = CompileProgressWindow(NoriterMain())
 	msgBox.setWindowFlags(Qt.Window | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
 	msgBox.show()
-	msgBox.setText(u"초기화 중...")
+	msgBox.setText("초기화 중...")
 	
 	def afterCompileProj(failFiles,inst):
-		OutputWindow().notice(u"테스트 플레이를 위한 컴파일 끝.")
-		OutputWindow().notice(u"파일 복사 중.")
-		msgBox.setText(u"파일 복사중...")
+		OutputWindow().notice("테스트 플레이를 위한 컴파일 끝.")
+		OutputWindow().notice("파일 복사 중.")
+		msgBox.setText("파일 복사중...")
 
 		dispath = user_data_dir("pini_remote","")+"/"
 		BUILDPATH = ProjectController().path + "/build/"
 		BUILDPATH = BUILDPATH.replace("\\","/")
 		
-		print BUILDPATH
+		print(BUILDPATH)
 
 		if clean : 
 			try:
 				shutil.rmtree(dispath)
-			except Exception, e:
+			except Exception as e:
 				pass
 		try:
 			for root, dirs, files in os.walk(BUILDPATH, topdown=False):
@@ -498,31 +496,31 @@ def __run__(clean,isCurrentScene,startLine=None):
 					dist = dispath+path.replace(BUILDPATH,"")
 					if os.path.isdir(dist) == False :
 						os.makedirs(dist)
-		except Exception, e:
+		except Exception as e:
 			msgBox.hide()
-			QMessageBox.warning(NoriterMain(),"pini",u"파일 복사에 실패하였습니다. 관리자모드로 실행하시거나 컴퓨터를 재부팅 후 다시 시도해주세요.")
+			QMessageBox.warning(NoriterMain(),"pini","파일 복사에 실패하였습니다. 관리자모드로 실행하시거나 컴퓨터를 재부팅 후 다시 시도해주세요.")
 			return
 
-		if type(failFiles) == types.StringType:
+		if type(failFiles) == bytes:
 			msgBox.hide()
-			QMessageBox.warning(NoriterMain(),"pini",u"다음의 이유로 실패하였습니다.\n" + failFiles)
+			QMessageBox.warning(NoriterMain(),"pini","다음의 이유로 실패하였습니다.\n" + failFiles)
 			return
 
 		if failFiles == None:
 			msgBox.hide()
-			QMessageBox.warning(NoriterMain(),"pini",u"비정상적인 이유로 컴파일에 실패하였습니다.")
+			QMessageBox.warning(NoriterMain(),"pini","비정상적인 이유로 컴파일에 실패하였습니다.")
 			return
 
 		if len(failFiles) > 0 :
-			failFile = u""
+			failFile = ""
 
 			for fileName in failFiles:
 				if len(failFile) != 0:
 					failFile = failFile + ","
-				failFile = failFile + "\"" + fileName[0] + u".lnx\" 파일의 "
-				failFile = failFile + unicode(str(fileName[1]+1)) + u"번째 줄"
+				failFile = failFile + "\"" + fileName[0] + ".lnx\" 파일의 "
+				failFile = failFile + str(str(fileName[1]+1)) + "번째 줄"
 			msgBox.hide()
-			QMessageBox.warning(NoriterMain(),"pini",failFile+u"에 스크립트 파일에 에러가 있습니다. 수정 후 실행해주세요!")
+			QMessageBox.warning(NoriterMain(),"pini",failFile+"에 스크립트 파일에 에러가 있습니다. 수정 후 실행해주세요!")
 			return
 
 		HOST,PORT = "127.0.0.1",45674
@@ -533,13 +531,13 @@ def __run__(clean,isCurrentScene,startLine=None):
 				if ProjectController().fullscreen : 
 					proc = subprocess.Popen([APPPATH+"/pini_remote.exe","--fullscreen"], cwd=APPPATH)
 				else:
-					print [APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH
-					print [APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH
-					print [APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH
-					print [APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH
-					print [APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH
-					print [APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH
-					print [APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH
+					print([APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH)
+					print([APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH)
+					print([APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH)
+					print([APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH)
+					print([APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH)
+					print([APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH)
+					print([APPPATH+"/pini_remote.exe","--nonfullscreen"], APPPATH)
 					proc = subprocess.Popen([APPPATH+"/pini_remote.exe","--nonfullscreen","-workdir "+APPPATH], cwd=APPPATH)
 		def remoting():
 			remote = RemoteClient(NoriterMain())
@@ -576,12 +574,12 @@ def CleanTestRun():
 
 	try:
 		shutil.rmtree(BUILDPATH)
-	except Exception, e:
+	except Exception as e:
 		pass
 
 	try:
 		os.makedirs(BUILDPATH)
-	except Exception, e:
+	except Exception as e:
 		pass
 
 	__run__(True,False)

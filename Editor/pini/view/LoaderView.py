@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 from PySide.QtGui import *
 from PySide.QtCore import *
@@ -11,7 +9,7 @@ from controller.ProjectController import ProjectController
 
 import os
 import json
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import locale
 
 class UpdatorUpdateThread(QThread):
@@ -20,8 +18,8 @@ class UpdatorUpdateThread(QThread):
 		if os.path.isfile("../_pygit2.pyd") : 
 			try:
 				distURL = "http://nooslab.com/piniengine/updator_latest/"
-				req = urllib2.Request(url=distURL+'version.inf')
-				f = urllib2.urlopen(req)
+				req = urllib.request.Request(url=distURL+'version.inf')
+				f = urllib.request.urlopen(req)
 
 				serverVer = int(f.read())
 				localVer = -1
@@ -43,24 +41,24 @@ class UpdatorUpdateThread(QThread):
 					filename = wget.download(url)
 
 					try:
-						os.remove(u"../피니엔진.exe")
-					except Exception, e:
+						os.remove("../피니엔진.exe")
+					except Exception as e:
 						sys.stderr.write( str(e) )
 						sys.stderr.write( "\n" )
 
 					try:
-						os.rename(filename,u"../피니엔진.exe")
-					except Exception, e:
+						os.rename(filename,"../피니엔진.exe")
+					except Exception as e:
 						sys.stderr.write( str(e) )
 						sys.stderr.write( "\n" )
 
-			except Exception, e:
+			except Exception as e:
 				sys.stderr.write( str(e) )
 
 class LoaderWindow(QLabel):
 	def __init__(self,parent=None):
 		super(LoaderWindow,self).__init__(parent)
-		rec = QApplication.desktop().screenGeometry();
+		rec = QApplication.primaryScreen().availableGeometry();
 		height = rec.height();
 		width = rec.width();
 
@@ -104,7 +102,7 @@ class LoaderWindow(QLabel):
 		css.open( QFile.ReadOnly )
 
 		styleSheet = css.readAll()
-		QApplication.instance().setStyleSheet(unicode(styleSheet))
+		QApplication.instance().setStyleSheet(str(styleSheet))
 
 		css.close()
 
@@ -172,14 +170,14 @@ class LoaderWindow(QLabel):
 		m.SetMain(SceneDocument(m))
 
 	def step9(self):
-		print "step9_0"
+		print("step9_0")
 		from view.SceneScriptWindow import SceneScriptWindowManager
 		# print "step9_1"
 		m = NoriterMain()
 		m.setWindowIcon(QIcon('resource/logoIcon64.png')) 
 		# print "step9_2"
 		# self.bb = SceneScriptWindow(m)
-		print "step9_3"
+		print("step9_3")
 		SceneScriptWindowManager()
 	
 	def step10(self):
@@ -217,19 +215,19 @@ class LoaderWindow(QLabel):
 			path = []
 			for v in paths:
 				v = v.replace("/","\\")
-				path.append(v.encode(locale.getpreferredencoding()))
+				path.append(v)
 			ret = os.path.join(*path).replace("/","\\")
 			return ret
 
 		tmp_path_master = PJOIN(".","tempSave","PROJ")
-		if os.path.exists(tmp_path_master):
+		if os.path.exists(tmp_path_master) and not os.environ.get("PINI_SKIP_RECOVERY"):
 			from controller.SceneListController import SceneListController
 			from view.SceneScriptWindow import SceneScriptWindowManager
 
 			DAT = json.loads(fileOpen(tmp_path_master))
 
 			if not os.path.exists(DAT["PROJ"]):
-				print "NO BACKUP PROJECT FOUND"
+				print("NO BACKUP PROJECT FOUND")
 				return
 
 			launcher.close()
@@ -237,16 +235,15 @@ class LoaderWindow(QLabel):
 			ProjectController().path = DAT["PROJ"]
 			PROJPATH = DAT["PROJ"]
 
-			QMessageBox.warning(self,u"피니엔진",u"저장되지 않은 파일이 감지되었습니다. 임시파일을 불러옵니다.")
+			QMessageBox.warning(self,"피니엔진","저장되지 않은 파일이 감지되었습니다. 임시파일을 불러옵니다.")
 			NoriterMain().show()
 
 			for root, dirs, files in os.walk(PJOIN(".","tempSave"), topdown=False):
 				for backupFileName in files:
 					if backupFileName != "PROJ":
-						backupFileName = backupFileName.decode('mbcs')
-						BACK = json.loads(fileOpen(PJOIN(".","tempSave",backupFileName).decode('mbcs')))
-						targetFileName = backupFileName.replace(u"__!_",u"/").replace(u".tmp",u".lnx")
-						relativePath = u"scene/"+targetFileName
+						BACK = json.loads(fileOpen(PJOIN(".","tempSave",backupFileName)))
+						targetFileName = backupFileName.replace("__!_","/").replace(".tmp",".lnx")
+						relativePath = "scene/"+targetFileName
 						SceneListController.getInstance().Open(PROJPATH+"/scene/"+targetFileName)
 
 						SceneScriptWindowManager.getInstance().windows[relativePath].editor.setPlainText(BACK["PLAIN"])

@@ -19,7 +19,7 @@ class ContextMenu(QMenu):
 			for item in arr[1:]:
 				if isinstance(item,list):
 					target.addMenu(ContextMenu(item,target))
-				elif isinstance(item,basestring):
+				elif isinstance(item,str):
 					target.addAction(QAction(target.tr(item), target))
 				elif isinstance(item,tuple):
 					title,data = item

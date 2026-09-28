@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 import os
 import json
@@ -53,11 +51,11 @@ class SceneListController(QObject):
 				#temp파일은 2번파일 최신 연 파일은 3번파일 이렇게 되면 꼬이니까 temp파일 삭제해줌.
 				try:
 					os.remove(os.path.join(".","tmp_save_1"))
-				except Exception, e:
+				except Exception as e:
 					pass
 				try:
 					os.remove(os.path.join(".","tmp_save_2"))
-				except Exception, e:
+				except Exception as e:
 					pass
 				Settings()["lastSceneLoaded"] = curDir.relativeFilePath(path)
 

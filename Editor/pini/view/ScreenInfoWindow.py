@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 from PySide import QtGui,QtCore
 from Noriter.UI.ModalWindow import ModalWindow 
@@ -53,5 +51,5 @@ class ScreenInfoWindow(ModalWindow):
 				proCtrl.screenHeight = h
 				proCtrl.orientation = self.orientation.isChecked()
 				proCtrl.fullscreen = self.fullscreen.isChecked()
-		except Exception, e:
+		except Exception as e:
 			pass

@@ -27,20 +27,20 @@ class NoriterMain(nMain.MainWindow):
 		self.docks = {}
 
 	def Dock(self,position,widget,tabify=True):
-		print "9_4_0"
+		print("9_4_0")
 		self.addDockWidget(position,widget)
-		print "9_4_1"
+		print("9_4_1")
 		widget.setFloating(False)
-		print "9_4_2"
+		print("9_4_2")
 		if tabify : 
-			print "9_4_2-1"
+			print("9_4_2-1")
 			if position in self.docks : 
-				print "9_4_2-1-1"
+				print("9_4_2-1-1")
 				self.tabifyDockWidget(self.docks[position],widget);
 
-		print "9_4_3"
+		print("9_4_3")
 		self.docks[position] = widget
-		print "9_4_4"
+		print("9_4_4")
 
 	def SetMain(self,widget):
 		self.setCentralWidget(widget)

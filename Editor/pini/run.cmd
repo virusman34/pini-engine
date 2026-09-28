@@ -1,6 +1,5 @@
 
 @echo off
-
-python main.py
-
-pause
+cd /d "%~dp0"
+"..\..\.venv\Scripts\python.exe" main.py
+if errorlevel 1 pause

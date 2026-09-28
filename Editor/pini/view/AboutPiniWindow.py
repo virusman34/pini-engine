@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 from PySide import QtGui,QtCore
 from Noriter.UI.ModalWindow import ModalWindow 
@@ -37,7 +35,7 @@ class AboutPiniWindow(ModalWindow):
 
 			fin = None
 			fp.close()
-		except Exception, e:
+		except Exception as e:
 			pass
 
 		with Layout.HBox(5):
@@ -72,5 +70,5 @@ class AboutPiniWindow(ModalWindow):
 				proCtrl.screenHeight = h
 				proCtrl.orientation = self.orientation.isChecked()
 				#proCtrl.fullscreen = self.fullscreen.isChecked()
-		except Exception, e:
+		except Exception as e:
 			pass

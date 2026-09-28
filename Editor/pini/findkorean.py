@@ -14,7 +14,7 @@ for root, dirs, files in os.walk(".", topdown=False):
 			#print data
 
 			for m in p.finditer(data):
-				print name,m.start(), m.group().decode("utf8")
+				print(name,m.start(), m.group())
 				fw.write(name)
 				fw.write(",")
 				fw.write(str(m.start()))
